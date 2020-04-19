@@ -18,9 +18,13 @@ jobs:
     - name: DB Schema validation
       run: make env=ci schema-validate
     - name: CS
-      run: make env=ci cs-check;make env=ci style;make env=ci layer
+      run: make env=ci cs-check;make env=ci style;
       continue-on-error: true
     - name: Tests
       run: make env=ci xon;make env=ci conf="--coverage-clover build/logs/clover.xml" phpunit
     - name: ARTIFACT
       run: make env=ci artifact
+    - name: Coveralls install
+      run: wget -c -nc --retry-connrefused --tries=0 https://github.com/php-coveralls/php-coveralls/releases/download/v2.2.0/php-coveralls.phar -O coveralls.phar;chmod +x coveralls.phar;
+    - name: Coveralls report
+      run: docker-compose exec -T php sh -lc "COVERALLS_RUN_LOCALLY=1 COVERALLS_EVENT_TYPE='manual' CI_NAME='php-coveralls' php coveralls.phar -v"
